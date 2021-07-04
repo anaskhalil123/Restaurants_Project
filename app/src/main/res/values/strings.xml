@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Restaurants_Project</string>
+    <string name="app_name2" translatable="false">وجـبـاتـي</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_admin_maps">Map</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_profile">الملف الشخصي</string>
+    <string name="title_basket">السلة</string>
+    <string name="title_restaurants">مطاعم</string>
+</resources>
