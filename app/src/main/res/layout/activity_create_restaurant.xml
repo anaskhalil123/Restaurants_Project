@@ -21,7 +21,7 @@
         app:layout_constraintVertical_bias="0.121" />
 
     <EditText
-        android:id="@+id/textRestaurantNameDetails"
+        android:id="@+id/textRestaurantName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"

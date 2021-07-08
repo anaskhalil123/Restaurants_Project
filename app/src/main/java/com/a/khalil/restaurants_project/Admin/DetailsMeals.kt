@@ -16,7 +16,6 @@ class DetailsMeals : AppCompatActivity() {
 
         }
 
-
         btnDelete.setOnClickListener {
 
             val alertDialog = AlertDialog.Builder(this)

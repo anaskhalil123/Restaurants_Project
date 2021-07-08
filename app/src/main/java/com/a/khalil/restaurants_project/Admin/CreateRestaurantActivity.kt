@@ -32,13 +32,21 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
     lateinit var progressDialog: ProgressDialog
     var path: String? = null
     lateinit var sharedPreferences: SharedPreferences
-    var latitude: Float? = null
-    var longitude: Float? = null
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
+    var restaurant_name = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_restaurant)
-        sharedPreferences = getSharedPreferences("interact with map", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences("create with map", MODE_PRIVATE)
+
+        if (applicationContext.getSharedPreferences("create with map", MODE_PRIVATE)
+                .getFloat("latitude", 0.0f) != 0.0f
+        ) {
+            pointInMap.text = "${latitude.toFloat()} , ${longitude.toFloat()}"
+        }
 
         storage = Firebase.storage
         reference = storage!!.reference
@@ -49,22 +57,34 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
         progressDialog.setCancelable(false)
 
 
-        if (intent.getFloatExtra("latitudeToCreate", 0f) == 0f
-            && intent.getFloatExtra("latitudeToCreate", 0f) == 0f
-        ) {
-
-        } else {
-            latitude = intent.getFloatExtra("latitudeToCreate", 0f)
-            longitude = intent.getFloatExtra("longitudeToCreate", 0f)
-            pointInMap.text = "$latitude , $longitude"
-        }
+//        if (intent.getFloatExtra("latitudeToCreate", 0f) == 0f
+//            && intent.getFloatExtra("latitudeToCreate", 0f) == 0f
+//        ) {
+//
+//        } else {
+//            latitude = intent.getFloatExtra("latitudeToCreate", 0f)
+//            longitude = intent.getFloatExtra("longitudeToCreate", 0f)
+//            pointInMap.text = "$latitude , $longitude"
+//        }
 
         imageForRess.setOnClickListener {
             PickImageDialog.build(PickSetup()).show(this)
         }
 
+
         ratingBarDetails.setOnRatingBarChangeListener(object : RatingBar.OnRatingBarChangeListener {
             override fun onRatingChanged(p0: RatingBar?, p1: Float, p2: Boolean) {
+                sharedPreferences = getSharedPreferences("create with map", MODE_PRIVATE)
+
+                latitude = sharedPreferences.getFloat("latitude", 0.0f).toDouble()
+
+                longitude = sharedPreferences.getFloat("longitude", 0.0f).toDouble()
+
+                if (latitude != 0.0 && longitude != 0.0) {
+                    pointInMap.text = "${latitude.toFloat()} , ${longitude.toFloat()}"
+                } else {
+                    pointInMap.text = ""
+                }
 
                 val rateValue = ratingBarDetails.rating
 
@@ -90,40 +110,56 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
         }
 
         openMapDetails.setOnClickListener {
-            if (!textRestaurantNameDetails.text.equals(null)) {
-                StaticThings.RestaurantTitle = textRestaurantNameDetails.text.toString()
+//            if (!textRestaurantNameDetails.text.equals(null)) {
+//                StaticThings.RestaurantTitle = textRestaurantNameDetails.text.toString()
+//            Log.e("anas", "$latitude , $longitude")
 
-                if (latitude != null && longitude != null) {
-                    val intent = Intent(this, AdminMapsActivity::class.java)
-                    intent.putExtra("createlatitude", latitude)
-                    intent.putExtra("createlongitude", longitude)
-                    startActivity(intent)
-                } else {
-                    startActivity(Intent(this, AdminMapsActivity::class.java))
+            if (latitude == 0.0 && longitude == 0.0) {
+                val intent = Intent(this, AdminMapsActivity::class.java)
+                if (!textRestaurantName.text.equals(null) && !textRestaurantName.text.equals(" ")) {
+                    intent.putExtra("nameFromCreate", textRestaurantName.text.toString())
                 }
-
+                startActivity(intent)
+            } else {
+                val intent = Intent(this, AdminMapsActivity::class.java)
+                intent.putExtra("latitudeFromCreate", latitude)
+                intent.putExtra("longitudeFromCreate", longitude)
+                if (!textRestaurantName.text.equals(null) && !textRestaurantName.text.equals(" ")) {
+                    intent.putExtra("nameFromCreate", textRestaurantName.text.toString())
+                }
+                startActivity(intent)
             }
+
+
+//            if (latitude != null && longitude != null) {
+//                val intent = Intent(this, AdminMapsActivity::class.java)
+//                intent.putExtra("createlatitude", latitude)
+//                intent.putExtra("createlongitude", longitude)
+//                if (!restaurant_name.equals("")) {
+//                    intent.putExtra("nameFromCreate", restaurant_name)
+//                }
+//                startActivity(intent)
+//            } else {
+//                startActivity(Intent(this, AdminMapsActivity::class.java))
+//            }
+
+//            }
 
         }
 
         createResBtn.setOnClickListener {
 
-            if (!path.equals(null) && !(textRestaurantNameDetails.text.equals(null) || textRestaurantNameDetails.text.equals(
-                    " "
-                ))
-                && !(textRestaurantAddressDetails.text.equals(null) || textRestaurantNameDetails.text.equals(
-                    " "
-                ))
+            if (!path.equals(null) && !(textRestaurantName.text.equals(null)
+                        || textRestaurantName.text.equals(" ")) &&
+                !(textRestaurantAddressDetails.text.equals(null)
+                        || textRestaurantName.text.equals(" "))
                 && !(ratingBarDetails.rating.equals(null) || ratingBarDetails.rating.equals(0.0f))
-                && latitude != null
-                && longitude != null
+                && latitude != 0.0
+                && longitude != 0.0
             ) {
-                val restaurant_name = textRestaurantNameDetails.text.toString()
+                restaurant_name = textRestaurantName.text.toString()
                 val restaurant_address = textRestaurantAddressDetails.text.toString()
                 val rateValue = ratingBarDetails.rating
-                val latitude = this.latitude
-                val longitude = this.longitude
-
 
 
                 StaticThings.RestaurantTitle = restaurant_name
@@ -133,8 +169,8 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
                     restaurant_name,
                     restaurant_address,
                     rateValue,
-                    latitude!!,
-                    longitude!!
+                    latitude,
+                    longitude
                 )
 
                 Toast.makeText(
@@ -142,7 +178,7 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
                     "تم إضافة مطعم", Toast.LENGTH_SHORT
                 ).show()
                 Log.e("name", restaurant_name)
-
+//                finish()
             } else {
                 Toast.makeText(
                     this,
@@ -180,8 +216,8 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
         name: String,
         address: String,
         rating: Float,
-        latitude: Float,
-        longitude: Float
+        latitude: Double,
+        longitude: Double
     ) {
         val restaurant = hashMapOf(
             "path" to path,
@@ -197,7 +233,7 @@ class CreateRestaurantActivity : AppCompatActivity(), IPickResult {
         }.addOnFailureListener { exception ->
 
         }
+        finish()
     }
-
 
 }

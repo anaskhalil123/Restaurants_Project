@@ -64,7 +64,6 @@ class ViewRestaurantsActivity : AppCompatActivity() {
             }
         }
 
-
         allRestaurants.layoutManager = GridLayoutManager(this, 2)
         allRestaurants.adapter = adapter
     }

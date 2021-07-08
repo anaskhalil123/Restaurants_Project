@@ -25,45 +25,45 @@ class MealsActivity : AppCompatActivity() , Adapter.onClick {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_meals)
-        var data = ArrayList<Meal>()
-        var db: FirebaseFirestore? = null
-        var adpter: FirestoreRecyclerAdapter<Meal,RestViewHolder>? = null
+//        var data = ArrayList<Meal>()
+//        var db: FirebaseFirestore? = null
+//        var adpter: FirestoreRecyclerAdapter<Meal,RestViewHolder>? = null
+//
+//        fun getAllUser() {
+//            val query = db!!.collection("meals")
+//            val options = FirestoreRecyclerOptions.Builder<Meal>().setQuery(query, Meal::class.java).build()
+//
+//            adpter = object : FirestoreRecyclerAdapter<Meal , RestViewHolder>(options) {
+//                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):RestViewHolder {
+//                    var view = LayoutInflater.from(applicationContext)
+//                        .inflate(R.layout.meals_item, parent, false)
+//                    return RestViewHolder(view)
+//                }
+//
+//                override fun onBindViewHolder(p0: RestViewHolder, p1: Int, p2: Meal) {
+//                    p0.title.text = getText(p1)
+//                    intent.putExtra("image",data[p1].image)
+//                    intent.putExtra("title",data[p1].title)
+//                    Glide.with(applicationContext).load(p0.image).into(p0.image)
+//                }
+//
+//            }
+//
 
-        fun getAllUser() {
-            val query = db!!.collection("meals")
-            val options = FirestoreRecyclerOptions.Builder<Meal>().setQuery(query, Meal::class.java).build()
+//        }
 
-            adpter = object : FirestoreRecyclerAdapter<Meal , RestViewHolder>(options) {
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):RestViewHolder {
-                    var view = LayoutInflater.from(applicationContext)
-                        .inflate(R.layout.meals_item, parent, false)
-                    return RestViewHolder(view)
-                }
-
-                override fun onBindViewHolder(p0: RestViewHolder, p1: Int, p2: Meal) {
-                    p0.title.text = getText(p1)
-                    intent.putExtra("image",data[p1].image)
-                    intent.putExtra("title",data[p1].title)
-                    Glide.with(applicationContext).load(p0.image).into(p0.image)
-                }
-
-            }
-
-
-        }
-
-            db = Firebase.firestore
-
-            getAllUser()
-
-            data.add(Meal(R.drawable.cheken , "تشيكن بيتزا"))
-            data.add(Meal( R.drawable.barger, "برجر عربي" ))
-            data.add(Meal(R.drawable.m1, "معكرونة"))
-            data.add(Meal(R.drawable.m2 , "شاورما"))
-
-            var adapter= Adapter(this, data, Click = this)
-            restaurant_list.layoutManager = GridLayoutManager(this, 2)
-            restaurant_list.adapter = adapter
+//            db = Firebase.firestore
+//
+//            getAllUser()
+//
+//            data.add(Meal(R.drawable.cheken , "تشيكن بيتزا"))
+//            data.add(Meal( R.drawable.barger, "برجر عربي" ))
+//            data.add(Meal(R.drawable.m1, "معكرونة"))
+//            data.add(Meal(R.drawable.m2 , "شاورما"))
+//
+//            var adapter= Adapter(this, data, Click = this)
+//            restaurant_list.layoutManager = GridLayoutManager(this, 2)
+//            restaurant_list.adapter = adapter
 
 
 

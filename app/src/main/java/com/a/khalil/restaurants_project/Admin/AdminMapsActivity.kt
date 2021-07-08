@@ -1,6 +1,6 @@
 package com.a.khalil.restaurants_project.Admin
 
-import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +24,9 @@ class AdminMapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var createLongitude: Float? = null
     var detailsLatitude: Float? = null
     var detailsLongitude: Float? = null
+    lateinit var sharedPreferences: SharedPreferences
+    lateinit var sharedPreferences1: SharedPreferences
+    var restaurantNameInMap:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,60 +40,78 @@ class AdminMapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
 
-
         returnBtn.setOnClickListener {
-
-            if (detailsLatitude == null && detailsLongitude == null) {
-                val intent = Intent(this, CreateRestaurantActivity::class.java)
-                intent.putExtra("latitudeToCreate", createLatitude)
-                intent.putExtra("longitudeToCreate", createLongitude)
-                startActivity(intent)
-            } else {
-                val intent = Intent(this,RestaurantDetailsActivity::class.java)
-                intent.putExtra("latitudeToDetails",detailsLatitude)
-                intent.putExtra("longitudeToDetails",detailsLongitude)
-                intent.putExtra("name",StaticThings.RestaurantTitle)
-                startActivity(intent)
-            }
+            finish()
+//            if (detailsLatitude == null && detailsLongitude == null) {
+//                val intent = Intent(this, CreateRestaurantActivity::class.java)
+//                intent.putExtra("latitudeToCreate", createLatitude)
+//                intent.putExtra("longitudeToCreate", createLongitude)
+//                startActivity(intent)
+//                finish()
+//            } else {
+//                val intent = Intent(this, RestaurantDetailsActivity::class.java)
+//                intent.putExtra("latitudeToDetails", detailsLatitude)
+//                intent.putExtra("longitudeToDetails", detailsLongitude)
+//                intent.putExtra("name", StaticThings.RestaurantTitle)
+//                startActivity(intent)
+//                finish()
+//            }
         }
     }
 
 
-override fun onMapReady(googleMap: GoogleMap) {
+    override fun onMapReady(googleMap: GoogleMap) {
 
-    mMap = googleMap
+        sharedPreferences = getSharedPreferences("create with map", MODE_PRIVATE)
+        sharedPreferences1 = getSharedPreferences("details with map", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val editor1 = sharedPreferences1.edit()
 
-    if (!intent.getFloatExtra("createlatitude", 0f).equals(null) &&
-        !intent.getFloatExtra("createlongitude", 0f).equals(null) &&
-        !intent.getFloatExtra("createlatitude", 0f).equals(0f) &&
-        !intent.getFloatExtra("createlongitude", 0f).equals(0f)
-    ) {
+        mMap = googleMap
 
-        createLatitude = intent.getFloatExtra("createlatitude", 0f)
-        createLongitude = intent.getFloatExtra("createlongitude", 0f)
+        if (!intent.getDoubleExtra("latitudeFromCreate", 0.0).equals(0.0) &&
+            !intent.getDoubleExtra("longitudeFromCreate", 0.0).equals(0.0)) {
 
-        point = LatLng(createLatitude!!.toDouble(), createLongitude!!.toDouble())
-        mMap!!.addMarker(
-            MarkerOptions().position(point).title(StaticThings.RestaurantTitle)
-        )
-        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
-    } else if (
-        !intent.getFloatExtra("detailsLatitude", 0f).equals(null) &&
-        !intent.getFloatExtra("detailsLatitude", 0f).equals(0f) &&
-        !intent.getFloatExtra("detailsLongitude", 0f).equals(null) &&
-        !intent.getFloatExtra("detailsLongitude", 0f).equals(0f)
-    ) {
-        detailsLatitude = intent.getFloatExtra("detailsLatitude", 0f)
-        detailsLongitude = intent.getFloatExtra("detailsLongitude", 0f)
-        point = LatLng(detailsLatitude!!.toDouble(), detailsLongitude!!.toDouble())
-        mMap!!.addMarker(
-            MarkerOptions().position(point).title(StaticThings.RestaurantTitle)
-        )
-        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
+            createLatitude = intent.getDoubleExtra("latitudeFromCreate", 0.0).toFloat()
+            createLongitude = intent.getDoubleExtra("longitudeFromCreate", 0.0).toFloat()
+            if (!intent.getStringExtra("nameFromCreate").equals(null)){
+                restaurantNameInMap = intent.getStringExtra("nameFromCreate")!!
+            }
 
-    } else {
+            editor.putFloat("latitude",createLatitude!!)
+            editor.putFloat("longitude",createLongitude!!)
+            editor.apply()
 
-    }
+            point = LatLng(createLatitude!!.toDouble(), createLongitude!!.toDouble())
+            mMap!!.addMarker(
+                MarkerOptions().position(point).title(restaurantNameInMap)
+            )
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
+        } else if (
+            !intent.getDoubleExtra("detailsLatitude", 0.0).equals(0.0) &&
+            !intent.getDoubleExtra("detailsLatitude", 0.0).equals(0.0)  ) {
+
+            if (!intent.getStringExtra("nameFromDetails").equals(null)){
+                restaurantNameInMap = intent.getStringExtra("nameFromDetails")!!
+            }
+
+            detailsLatitude = intent.getFloatExtra("detailsLatitude", 0f)
+            detailsLongitude = intent.getFloatExtra("detailsLongitude", 0f)
+
+            editor1.putFloat("latitude",detailsLatitude!!)
+            editor1.putFloat("longitude",detailsLongitude!!)
+            editor1.apply()
+
+
+            point = LatLng(detailsLatitude!!.toDouble(), detailsLongitude!!.toDouble())
+            mMap!!.addMarker(
+                MarkerOptions().position(point).title(restaurantNameInMap)
+            )
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
+
+        } else {
+
+        }
 
 //        if (StaticThings.currentLatitude != null && StaticThings.currentLongitude != null) {
 //            point = LatLng(
@@ -113,27 +134,41 @@ override fun onMapReady(googleMap: GoogleMap) {
 //            StaticThings.latitude = null
 //        }
 
-    mMap!!.setOnMapClickListener { latLng ->
-        mMap!!.clear()
+        mMap!!.setOnMapClickListener { latLng ->
+            mMap!!.clear()
 //            StaticThings.latitude = latLng.latitude.toFloat()
 //            StaticThings.longitude = latLng.longitude.toFloat()
-        point = latLng
-        if (detailsLatitude == null && detailsLongitude == null) {
-            createLatitude = point!!.latitude.toFloat()
-            createLongitude = point!!.longitude.toFloat()
-        } else {
-            detailsLatitude = point!!.latitude.toFloat()
-            detailsLongitude = point!!.longitude.toFloat()
+            point = latLng
+
+            if (detailsLatitude == null && detailsLongitude == null) {
+                createLatitude = point!!.latitude.toFloat()
+                createLongitude = point!!.longitude.toFloat()
+                editor.putFloat("latitude",createLatitude!!)
+                editor.putFloat("longitude",createLongitude!!)
+                if (!intent.getStringExtra("nameFromCreate").equals(null)){
+                    restaurantNameInMap = intent.getStringExtra("nameFromCreate")!!
+                }
+                editor.apply()
+            } else {
+                detailsLatitude = point!!.latitude.toFloat()
+                detailsLongitude = point!!.longitude.toFloat()
+
+                editor1.putFloat("latitude",detailsLatitude!!)
+                editor1.putFloat("longitude",detailsLongitude!!)
+                editor1.apply()
+                if (!intent.getStringExtra("nameFromDetails").equals(null)){
+                    restaurantNameInMap = intent.getStringExtra("nameFromDetails")!!
+                }
+            }
+            mMap!!.addMarker(MarkerOptions().position(latLng).title(restaurantNameInMap))
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+
+            Toast.makeText(
+                this,
+                latLng.latitude.toString() + " , " + latLng.longitude.toString(),
+                Toast.LENGTH_SHORT
+            ).show()
+
         }
-        mMap!!.addMarker(MarkerOptions().position(latLng).title(StaticThings.RestaurantTitle))
-        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-
-        Toast.makeText(
-            this,
-            latLng.latitude.toString() + " , " + latLng.longitude.toString(),
-            Toast.LENGTH_SHORT
-        ).show()
-
     }
-}
 }
